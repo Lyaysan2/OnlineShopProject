@@ -31,10 +31,10 @@ namespace OnlineShopProject.Repository.impls
             return await _context.OrderProduct.Include(op => op.Product).Where(op => op.OrderId == orderId).ToListAsync();
         }
 
-        public async Task<List<int>> GetQuantityListOrderProductsAsync(List<int> productIds)
+        public async Task<List<int>> GetQuantityListOrderProductsReservedAsync(List<int> productIds)
         {
             var quantities = await _context.OrderProduct
-                .Where(pc => productIds.Contains(pc.ProductId))
+                .Where(pc => productIds.Contains(pc.ProductId) & pc.Reserved == ReservationStatus.Reserved)
                 .Select(pc => new { pc.ProductId, pc.Quantity })
                 .ToListAsync();
 

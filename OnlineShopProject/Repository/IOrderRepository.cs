@@ -8,7 +8,7 @@ namespace OnlineShopProject.Repository
         Task<Order> CreateOrderAsync(Order order);
         Task<List<Order>> GetAllOrdersAsync(AppUser appUser);
         Task<Order> GetOrderByIdAsync(int id);
-        Task<Order> GetOrderByUserAsync(AppUser user);
         Task<Order> ChangeOrderStatusAsync(Order order, OrderStatus status);
+        Task<Order> GetOrderInProcessStatusByUserAsync(AppUser user);
     }
 }

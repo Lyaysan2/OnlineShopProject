@@ -30,45 +30,44 @@ namespace OnlineShopProject.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            //var appUser = signUpDto.ToUserEntity();
             var appUser = _mapper.Map<AppUser>(signUpDto);
 
             var createdUser = await _userManager.CreateAsync(appUser, signUpDto.Password);
             if (!createdUser.Succeeded) return BadRequest(createdUser.Errors);
                 
-            var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+            var roleResult = await _userManager.AddToRoleAsync(appUser, "Admin");
             if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
-            //appUser.ToUserCreatedDto()
+
             var userDto = _mapper.Map<UserDto>(appUser);
             return Ok(userDto);
         }
 
-        //[HttpPost("sign-in")]
-        //public async Task<IActionResult> SignIn(SignInDto singInDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+        [HttpPost("sign-in")]
+        public async Task<IActionResult> SignIn([FromBody] SignInDto singInDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        //    var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == singInDto.Username);
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == singInDto.UserName);
 
-        //    if (user == null) return Unauthorized("Invalid username!");
+            if (user == null) return Unauthorized("Invalid username!");
 
-        //    var result = await _signInManager.CheckPasswordSignInAsync(user, singInDto.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, singInDto.Password, false);
 
-        //    if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
+            if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
 
-        //    var (token, expires) = _tokenService.CreateToken(user);
+            var (token, expires) = await _tokenService.CreateToken(user);
 
-        //    return Ok(user.ToUserTokenDto(token, expires));
-        //}
+            var userTokenDto = _mapper.Map<UserTokenDto>((user, token, expires));
+            return Ok(userTokenDto);
+        }
 
-        //[HttpPost("sign-out")]
-        //public async new Task<IActionResult> SignOut()
-        //{
-        //    await _signInManager.SignOutAsync();
+        [HttpPost("sign-out")]
+        public async new Task<IActionResult> SignOut()
+        {
+            await _signInManager.SignOutAsync();
 
-        //    return Ok("User logged out successfully");
-        //}
+            return Ok("User logged out successfully");
+        }
     }
 }
 

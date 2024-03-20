@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OnlineShopProject.Data;
@@ -14,6 +15,8 @@ using OnlineShopProject.Service.impl;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -94,6 +97,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHostedService<ReservationService>();
 builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -117,4 +121,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.Logger.LogInformation("Starting the app");
 app.Run();

@@ -38,9 +38,9 @@ namespace OnlineShopProject.Repository.impls
             return await _context.Order.FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<Order> GetOrderByUserAsync(AppUser user)
+        public async Task<Order> GetOrderInProcessStatusByUserAsync(AppUser user)
         {
-            return await _context.Order.FirstOrDefaultAsync(o => o.AppUserId == user.Id);
+            return await _context.Order.FirstOrDefaultAsync(o => o.AppUserId == user.Id & o.Status == OrderStatus.InProcess);
         }
     }
 }

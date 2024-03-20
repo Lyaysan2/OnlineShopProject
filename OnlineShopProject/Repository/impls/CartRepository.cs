@@ -55,10 +55,6 @@ namespace OnlineShopProject.Repository.impls
                 existingEntry.Status = cart.Status;
                 await _context.SaveChangesAsync();
             }
-            else
-            {
-                throw new Exception("нет такого продукта в корзине");
-            }
             return existingEntry;
         }
     }

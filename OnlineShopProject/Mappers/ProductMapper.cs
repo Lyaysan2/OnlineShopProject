@@ -1,20 +1,16 @@
-﻿using OnlineShopProject.Dto.ProductDTO;
+﻿using AutoMapper;
+using OnlineShopProject.Dto.ProductDTO;
+using OnlineShopProject.Dto.UserDTO;
 using OnlineShopProject.Models;
 
 namespace OnlineShopProject.Mappers
 {
-    public static class ProductMapper
+    public class ProductMapper : Profile
     {
-        public static ProductDto ToProductDto(this Product product)
+        public ProductMapper() 
         {
-            return new ProductDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                CategoriesDto = product.Categories.Select(c => c.ToCategoryDto()).ToList()
-            };
+            CreateMap<Product, ProductDto>()
+                .ForMember(dest => dest.CategoriesDto, opt => opt.MapFrom(src => src.Categories));
         }
     }
 }

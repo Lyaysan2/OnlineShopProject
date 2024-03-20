@@ -1,66 +1,39 @@
-﻿using OnlineShopProject.Dto.OrderDTO;
+﻿using AutoMapper;
+using OnlineShopProject.Dto.CategoryDTO;
+using OnlineShopProject.Dto.OrderDTO;
 using OnlineShopProject.Models;
 
 namespace OnlineShopProject.Mappers
 {
-    public static class OrderMapper
+    public class OrderMapper : Profile
     {
-        public static Order ToOrderEntity(this List<Cart> cart, AppUser user)
+        public OrderMapper() 
         {
-            return new Order
-            {
-                AppUserId = user.Id,
-                Status = Enums.OrderStatus.InProcess,
-                TotalPrice = cart.Sum(c => c.Product.Price * c.Quantity)
-            };
-        }
+            CreateMap<(List<Cart>, AppUser), Order>()
+                .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.Item2.Id))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => Enums.OrderStatus.InProcess))
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.Item1.Sum(c => c.Product.Price * c.Quantity)));
 
-        public static OrderProduct ToOrderProductEntity(this Cart cart, Order order)
-        {
-            return new OrderProduct
-            {
-                ProductId = cart.ProductId,
-                OrderId = order.Id,
-                Quantity = cart.Quantity
-            };
-        }
+            CreateMap<(Cart, Order), OrderProduct>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Item1.ProductId))
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Item2.Id))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Item1.Quantity));
 
-        public static OrderProductDto ToOrderProductDto(this OrderProduct orderProduct)
-        {
-            return new OrderProductDto
-            {
-                ProductId = orderProduct.ProductId,
-                ProductName = orderProduct.Product.Name,
-                ProductDescription = orderProduct.Product.Description,
-                Price = orderProduct.Product.Price,
-                Quantity = orderProduct.Quantity,
-                CreatedAt = orderProduct.CreatedAt
-            };
-        }
+            CreateMap<OrderProduct, OrderProductDto>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.ProductDescription, opt => opt.MapFrom(src => src.Product.Description))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price));
 
-        public static OrderProductExtendedDto ToOrderProductExtendedDto(this List<OrderProduct> orderProducts, Order order)
-        {
-            return new OrderProductExtendedDto
-            {
-                OrderId = order.Id,
-                OrderStatus = order.Status.ToString(),
-                OrderCreatedAt = order.CreatedAt,
-                OrderCompletedAt = order.CompletedAt,
-                TotalPrice = orderProducts.Sum(op => op.Product.Price * op.Quantity),
-                Products = orderProducts.Select(op => op.ToOrderProductDto()).ToList(),
-            };
-        }
+            CreateMap<(List<OrderProduct>, Order), OrderProductExtendedDto>()
+                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Item2.Id))
+                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Item2.Status.ToString()))
+                 .ForMember(dest => dest.OrderCreatedAt, opt => opt.MapFrom(src => src.Item2.CreatedAt))
+                 .ForMember(dest => dest.OrderCompletedAt, opt => opt.MapFrom(src => src.Item2.CompletedAt))
+                 .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.Item1.Sum(op => op.Product.Price * op.Quantity)))
+                 .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Item1));
 
-        public static OrderDto ToOrderDto(this Order order)
-        {
-            return new OrderDto
-            {
-                Id = order.Id,
-                Status = order.Status.ToString(),
-                CreatedAt = order.CreatedAt,
-                CompletedAt = order.CompletedAt,
-                TotalPrice = order.TotalPrice
-            };
+            CreateMap<Order, OrderDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }

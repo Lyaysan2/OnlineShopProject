@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using OnlineShopProject.Data;
-using OnlineShopProject.Mappers;
-using OnlineShopProject.Models;
+using OnlineShopProject.Dto.ProductDTO;
 using OnlineShopProject.Repository;
-using System.Runtime.InteropServices;
 
 namespace OnlineShopProject.Controllers
 {
@@ -14,11 +11,13 @@ namespace OnlineShopProject.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IMapper _mapper;
 
-        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -28,35 +27,39 @@ namespace OnlineShopProject.Controllers
             ? await _productRepository.GetAllAsync()
             : await _productRepository.GetAllBySearchNameAsync(search);
 
-            var productsDto = products.Select(p => p.ToProductDto()).ToList();
+            var productsDto = _mapper.Map<List<ProductDto>>(products);
             return Ok(productsDto);
         }
 
         [HttpGet("category")]
         public async Task<IActionResult> GetAllProductsByCategories([FromQuery] string categoryName)
         {
-            List<string> categoriesList = categoryName.Split('%').ToList();
-            var categories = await _categoryRepository.GetByNamesAsync(categoriesList);
-            var products = await _productRepository.GetAllByCategoryNamesAsync(categories);
+            try
+            {
+                List<string> categoriesList = categoryName.Split('%').ToList();
+                var categories = await _categoryRepository.GetByNamesAsync(categoriesList);
+                if (categories.Any(c => c == null)) return NotFound("Сategory was not found");
 
-            var productsDto = products.Select(p => p.ToProductDto()).ToList();
-            return Ok(productsDto);
+                var products = await _productRepository.GetAllByCategoryNamesAsync(categories);
+                var productsDto = _mapper.Map<List<ProductDto>>(products);
+                return Ok(productsDto);
+            } 
+            catch
+            {
+                return BadRequest("Invalid categoryName format");
+            }
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var product = await _productRepository.GetByIdAsync(id);
+            if (product == null) return NotFound();
 
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(product.ToProductDto());
+            var productDto = _mapper.Map<ProductDto>(product);
+            return Ok(productDto);
         }
     }
 }

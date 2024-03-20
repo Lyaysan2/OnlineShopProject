@@ -1,25 +1,17 @@
 ﻿using OnlineShopProject.Dto.CategoryDTO;
+using OnlineShopProject.Dto.ProductDTO;
 using OnlineShopProject.Models;
+using AutoMapper;
 
 namespace OnlineShopProject.Mappers
 {
-    public static class CategoryMapper
+    public class CategoryMapper : Profile
     {
-        public static CategoryDto ToCategoryDto(this Category category)
+        public CategoryMapper() 
         {
-            return new CategoryDto
-            {
-                Id = category.Id,
-                Name = category.Name
-            };
-        }
+            CreateMap<Category, CategoryDto>();
 
-        public static Category ToCategoryEntity(this AddCategoryDto addCategoryDto)
-        {
-            return new Category
-            {
-                Name = addCategoryDto.Name
-            };
+            CreateMap<AddCategoryDto, Category>();
         }
     }
 }

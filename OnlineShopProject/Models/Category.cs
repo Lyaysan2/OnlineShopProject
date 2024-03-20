@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace OnlineShopProject.Models
@@ -6,7 +7,7 @@ namespace OnlineShopProject.Models
     public class Category
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public List<Product> Products { get; set; } = new();
+        public string Name { get; set; }
+        public List<Product> Products { get; set; }
     }
 }

@@ -5,16 +5,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineShopProject.Dto.UserDTO
 {
-    //[AutoMap(typeof(AppUser))]
     public class SignUpDto
     {
         [Required]
-        public string UserName { get; set; } = string.Empty;
+        public string UserName { get; set; }
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = string.Empty;
-        //[Ignore]
+        public string Email { get; set; }
         [Required]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; }
     }
 }

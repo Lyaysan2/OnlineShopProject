@@ -4,6 +4,6 @@ namespace OnlineShopProject.Models
 {
     public class AppUser : IdentityUser<int>
     { 
-        public List<Order> Orders { get; set; } = new();
+        public List<Order> Orders { get; set; }
     }   
 }

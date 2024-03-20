@@ -9,13 +9,12 @@ namespace OnlineShopProject.Service
         private readonly IServiceProvider _serviceProvider;
         private Timer hostedTimer;
         private Timer reservationTimer;
-
-        //private readonly ILogger<ReservationService> logger;
+        private readonly ILogger<ReservationService> logger;
 
         public ReservationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            //this.logger = logger;
+            this.logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -39,7 +38,7 @@ namespace OnlineShopProject.Service
             {
                 orderProduct.Reserved = ReservationStatus.Reserved;
                 await dbContext.SaveChangesAsync();
-                //logger.LogInformation("reservation for order {reservation} started", reservation.ID);
+                logger.LogInformation($"Reservation for orderProduct {orderProduct.OrderId}-{orderProduct.ProductId} started");
                 reservationTimer = new Timer(EndReservation, orderProduct, TimeSpan.FromMinutes(10), Timeout.InfiniteTimeSpan);
             }
         }
@@ -50,12 +49,10 @@ namespace OnlineShopProject.Service
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
 
             var orderProduct = (OrderProduct)state;
-            Console.WriteLine($"order product = {orderProduct.ProductId}");
             var orderProductEntity = dbContext.OrderProduct.First(op => op.OrderId == orderProduct.OrderId && op.ProductId == orderProduct.ProductId);
-            Console.WriteLine($"entity = {orderProductEntity.ProductId}");
             orderProductEntity.Reserved = ReservationStatus.NotReserved;
             await dbContext.SaveChangesAsync();
-            //logger.LogInformation("reservation for order {reservation} ended", reservation.ID);
+            logger.LogInformation($"Reservation for orderProduct {orderProduct.OrderId}-{orderProduct.ProductId} ended");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

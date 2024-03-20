@@ -4,6 +4,6 @@ namespace OnlineShopProject.Service
 {
     public interface ITokenService
     {
-        (string token, DateTime expires) CreateToken(AppUser user);
+        Task<(string token, DateTime expires)> CreateToken(AppUser user);
     }
 }

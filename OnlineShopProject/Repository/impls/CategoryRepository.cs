@@ -11,7 +11,6 @@ namespace OnlineShopProject.Repository.impls
         {
             _context = applicationDBContext;
         }
-
         public async Task<Category> CreateCategoryAsync(Category category)
         {
             await _context.Category.AddAsync(category);
@@ -27,13 +26,8 @@ namespace OnlineShopProject.Repository.impls
         public async Task<List<Category>> GetByNamesAsync(List<string> names)
         {
             var allCategories = await GetAllAsync();
-            var categories = names.Select(name => allCategories.FirstOrDefault(c => c.Name == name));
-            if (categories.Contains(null))
-            {
-                //todo
-                throw new Exception("Неверные имена категорий в запросе");
-            }
-            return categories.ToList();
+            var categories = names.Select(name => allCategories.FirstOrDefault(c => c.Name == name)).ToList();
+            return categories;
         }
 
         public async Task<Category> UpdateCategoryAsync(int id, Category category)

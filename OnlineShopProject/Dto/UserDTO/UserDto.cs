@@ -3,7 +3,6 @@ using OnlineShopProject.Models;
 
 namespace OnlineShopProject.Dto.UserDTO
 {
-    //[AutoMap(typeof(AppUser))]
     public class UserDto
     {
         public int Id { get; set; }
