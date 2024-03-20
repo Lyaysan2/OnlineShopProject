@@ -5,8 +5,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace OnlineShopProject.Service.impl
+namespace OnlineShopProject.Service
 {
+    public interface ITokenService
+    {
+        Task<(string token, DateTime expires)> CreateToken(AppUser user);
+    }
+
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _config;

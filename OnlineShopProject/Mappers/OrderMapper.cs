@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using OnlineShopProject.Dto.CategoryDTO;
 using OnlineShopProject.Dto.OrderDTO;
 using OnlineShopProject.Models;
 

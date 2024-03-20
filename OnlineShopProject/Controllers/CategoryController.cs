@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShopProject.Dto.CategoryDTO;
-using OnlineShopProject.Mappers;
 using OnlineShopProject.Models;
 using OnlineShopProject.Repository;
 
@@ -14,10 +13,12 @@ namespace OnlineShopProject.Controllers
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        public CategoryController(ICategoryRepository categoryRepository, IMapper mapper) 
+        private readonly ILogger<CategoryController> _logger;
+        public CategoryController(ICategoryRepository categoryRepository, IMapper mapper, ILogger<CategoryController> logger)
         {
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -25,6 +26,7 @@ namespace OnlineShopProject.Controllers
         {
             var category = await _categoryRepository.GetAllAsync();
             var categoryDto = _mapper.Map<ICollection<CategoryDto>>(category);
+            _logger.LogInformation("Get all category called");
             return Ok(categoryDto);
         }
 
@@ -36,6 +38,7 @@ namespace OnlineShopProject.Controllers
             var category = _mapper.Map<Category>(categoryDto);
             var createdCategory = await _categoryRepository.CreateCategoryAsync(category);
             var createdCategoryDto = _mapper.Map<CategoryDto>(createdCategory);
+            _logger.LogInformation($"Category - {createdCategory.Id} created");
             return Ok(createdCategoryDto);
         }
 
@@ -51,6 +54,7 @@ namespace OnlineShopProject.Controllers
                 return NotFound();
             }
             var updatedCategoryDto = _mapper.Map<CategoryDto>(updatedCategory);
+            _logger.LogInformation($"In сategory - {updatedCategory.Id} name changed to {updatedCategory.Name}");
             return Ok(updatedCategoryDto);
         }
     }

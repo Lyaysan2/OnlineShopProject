@@ -1,5 +1,4 @@
 ﻿using OnlineShopProject.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineShopProject.Models
 {

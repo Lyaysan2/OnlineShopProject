@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
-namespace OnlineShopProject.Models
+﻿namespace OnlineShopProject.Models
 {
     public class Category
     {

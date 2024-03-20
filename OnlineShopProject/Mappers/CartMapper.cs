@@ -14,7 +14,7 @@ namespace OnlineShopProject.Mappers
                 .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.Item2.Id))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Item1.Quantity));
 
-            CreateMap<Cart, CartSavedDto>()
+            CreateMap<Cart, CartDto>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
             CreateMap<Cart, CartExtendedDto>()

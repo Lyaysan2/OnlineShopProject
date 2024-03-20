@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using OnlineShopProject.Dto.ProductDTO;
-using OnlineShopProject.Dto.UserDTO;
 using OnlineShopProject.Models;
 
 namespace OnlineShopProject.Mappers

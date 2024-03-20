@@ -1,16 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineShopProject.Data;
 using OnlineShopProject.Enums;
-using OnlineShopProject.Mappers;
 using OnlineShopProject.Models;
 
-namespace OnlineShopProject.Repository.impls
+namespace OnlineShopProject.Repository
 {
+    public interface IOrderProductRepository
+    {
+        Task<List<OrderProduct>> CreateOrderProductAsync(List<OrderProduct> orderProducts);
+        Task<List<int>> GetQuantityListOrderProductsReservedAsync(List<int> productIds);
+        Task<List<OrderProduct>> GetOrderProductsByOrderIdAsync(int orderId);
+        Task<List<OrderProduct>> ChangeReservProductAsync(int orderId, ReservationStatus status);
+    }
+
     public class OrderProductRepository : IOrderProductRepository
     {
         private readonly ApplicationDBContext _context;
-        public OrderProductRepository(ApplicationDBContext context) 
-        { 
+        public OrderProductRepository(ApplicationDBContext context)
+        {
             _context = context;
         }
         public async Task<List<OrderProduct>> CreateOrderProductAsync(List<OrderProduct> orderProducts)

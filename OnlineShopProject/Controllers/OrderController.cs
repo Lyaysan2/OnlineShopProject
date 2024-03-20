@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShopProject.Dto.OrderDTO;
-using OnlineShopProject.Mappers;
 using OnlineShopProject.Models;
 using OnlineShopProject.Repository;
 using System.Security.Claims;
@@ -21,8 +20,9 @@ namespace OnlineShopProject.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderProductRepository _orderProductRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<OrderController> _logger;
         public OrderController (UserManager<AppUser> userManager, ICartRepository cartRepository, IProductRepository productRepository, 
-            IOrderRepository orderRepository, IOrderProductRepository orderProductRepository, IMapper mapper)
+            IOrderRepository orderRepository, IOrderProductRepository orderProductRepository, IMapper mapper, ILogger<OrderController> logger)
         {
             _userManager = userManager;
             _cartRepository = cartRepository;
@@ -30,6 +30,7 @@ namespace OnlineShopProject.Controllers
             _orderRepository = orderRepository;
             _orderProductRepository = orderProductRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -40,6 +41,8 @@ namespace OnlineShopProject.Controllers
 
             var orders = await _orderRepository.GetAllOrdersAsync(user);
             var ordersDto = _mapper.Map<ICollection<OrderDto>>(orders);
+
+            _logger.LogInformation($"User - {user.Id} called get all his orders");
             return Ok(ordersDto);
         }
 
@@ -55,6 +58,8 @@ namespace OnlineShopProject.Controllers
 
             var orderProducts = await _orderProductRepository.GetOrderProductsByOrderIdAsync(order.Id);
             var orderProductsDto = _mapper.Map<OrderProductExtendedDto>((orderProducts, order));
+
+            _logger.LogInformation($"User - {user.Id} called get order by id - {id}");
             return Ok(orderProductsDto);
 
         }
@@ -76,7 +81,8 @@ namespace OnlineShopProject.Controllers
             var quantitiesProduct = await _productRepository.GetQuantityListProductsAsync(productsCart.Select(p => p.ProductId).ToList());
 
             //get reserved product quantities
-            var quantitiesOrderProduct = await _orderProductRepository.GetQuantityListOrderProductsReservedAsync(productsCart.Select(p => p.ProductId).ToList());
+            var quantitiesOrderProduct = await _orderProductRepository.GetQuantityListOrderProductsReservedAsync
+                (productsCart.Select(p => p.ProductId).ToList());
 
             //checking for all products in the order
             var quantitiesResult = quantitiesProduct.Select((x, i) => x - quantitiesOrderProduct[i] - productsCart[i].Quantity).ToList();
@@ -100,6 +106,8 @@ namespace OnlineShopProject.Controllers
             var orderProducts = productsCart.Select(x => _mapper.Map<(Cart, Order), OrderProduct>((x, order))).ToList();
             var savedOrderProducts = await _orderProductRepository.CreateOrderProductAsync(orderProducts);
             var orderProductsDto = _mapper.Map<OrderProductExtendedDto>((orderProducts, order));
+
+            _logger.LogInformation($"User - {user.Id} created order - {order.Id}");
             return Ok(orderProductsDto);
         }
     }

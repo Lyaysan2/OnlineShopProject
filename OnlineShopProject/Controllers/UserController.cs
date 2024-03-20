@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineShopProject.Dto.UserDTO;
-using OnlineShopProject.Mappers;
 using OnlineShopProject.Models;
 using OnlineShopProject.Service;
 
@@ -17,12 +16,15 @@ namespace OnlineShopProject.Controllers
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IMapper _mapper;
-        public UserController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IMapper mapper)
+        private readonly ILogger<UserController> _logger;
+        public UserController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, 
+            IMapper mapper, ILogger<UserController> logger)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost("sign-up")]
@@ -35,10 +37,12 @@ namespace OnlineShopProject.Controllers
             var createdUser = await _userManager.CreateAsync(appUser, signUpDto.Password);
             if (!createdUser.Succeeded) return BadRequest(createdUser.Errors);
                 
-            var roleResult = await _userManager.AddToRoleAsync(appUser, "Admin");
+            var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
             if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
 
             var userDto = _mapper.Map<UserDto>(appUser);
+
+            _logger.LogInformation($"User with email - {userDto.Email}, username - {userDto.UserName}, id - {userDto.Id} created");
             return Ok(userDto);
         }
 
@@ -58,15 +62,9 @@ namespace OnlineShopProject.Controllers
             var (token, expires) = await _tokenService.CreateToken(user);
 
             var userTokenDto = _mapper.Map<UserTokenDto>((user, token, expires));
+
+            _logger.LogInformation($"User with username - {singInDto.UserName} logged in");
             return Ok(userTokenDto);
-        }
-
-        [HttpPost("sign-out")]
-        public async new Task<IActionResult> SignOut()
-        {
-            await _signInManager.SignOutAsync();
-
-            return Ok("User logged out successfully");
         }
     }
 }

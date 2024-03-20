@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShopProject.Dto.OrderDTO;
 using OnlineShopProject.Enums;
-using OnlineShopProject.Mappers;
 using OnlineShopProject.Models;
 using OnlineShopProject.Repository;
 using System.Security.Claims;
@@ -22,8 +21,9 @@ namespace OnlineShopProject.Controllers
         private readonly ICartRepository _cartRepository;
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<PayController> _logger;
         public PayController(UserManager<AppUser> userManager, IOrderRepository orderRepository, IOrderProductRepository orderProductRepository, 
-            ICartRepository cartRepository, IProductRepository productRepository, IMapper mapper) 
+            ICartRepository cartRepository, IProductRepository productRepository, IMapper mapper, ILogger<PayController> logger) 
         {
             _userManager = userManager;
             _orderRepository = orderRepository;
@@ -31,6 +31,7 @@ namespace OnlineShopProject.Controllers
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -57,6 +58,8 @@ namespace OnlineShopProject.Controllers
                 await _productRepository.ReduceProductQuantity(orderProducts.ToDictionary(op => op.ProductId, op => op.Quantity));
 
                 var orderProductDto = _mapper.Map<OrderProductExtendedDto>((orderProducts, order));
+
+                _logger.LogInformation($"User - {user.Id} successfully paid for order - {order.Id}");
                 return Ok(orderProductDto);
             }
             else
@@ -67,6 +70,7 @@ namespace OnlineShopProject.Controllers
                 //change the status of the order to “not successful”
                 order = await _orderRepository.ChangeOrderStatusAsync(order, OrderStatus.NotSuccessful);
 
+                _logger.LogInformation($"User's - {user.Id} payment for order - {order.Id} was not saccessful");
                 return Conflict("Operation not successful");
             }
         }

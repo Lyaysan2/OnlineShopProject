@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using OnlineShopProject.Models;
-
-namespace OnlineShopProject.Dto.UserDTO
+﻿namespace OnlineShopProject.Dto.UserDTO
 {
     public class UserDto
     {

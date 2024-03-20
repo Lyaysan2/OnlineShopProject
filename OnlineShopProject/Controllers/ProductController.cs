@@ -12,12 +12,15 @@ namespace OnlineShopProject.Controllers
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProductController> _logger;
 
-        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, 
+            IMapper mapper, ILogger<ProductController> logger)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -28,6 +31,7 @@ namespace OnlineShopProject.Controllers
             : await _productRepository.GetAllBySearchNameAsync(search);
 
             var productsDto = _mapper.Map<List<ProductDto>>(products);
+            _logger.LogInformation("Get all product called");
             return Ok(productsDto);
         }
 
@@ -42,6 +46,7 @@ namespace OnlineShopProject.Controllers
 
                 var products = await _productRepository.GetAllByCategoryNamesAsync(categories);
                 var productsDto = _mapper.Map<List<ProductDto>>(products);
+                _logger.LogInformation($"Get all product by categories {categories} called");
                 return Ok(productsDto);
             } 
             catch
@@ -59,6 +64,7 @@ namespace OnlineShopProject.Controllers
             if (product == null) return NotFound();
 
             var productDto = _mapper.Map<ProductDto>(product);
+            _logger.LogInformation($"Get product by id - {id} called");
             return Ok(productDto);
         }
     }

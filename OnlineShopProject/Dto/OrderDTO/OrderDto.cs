@@ -1,7 +1,4 @@
-﻿using OnlineShopProject.Enums;
-using OnlineShopProject.Models;
-
-namespace OnlineShopProject.Dto.OrderDTO
+﻿namespace OnlineShopProject.Dto.OrderDTO
 {
     public class OrderDto
     {

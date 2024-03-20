@@ -1,11 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineShopProject.Data;
 using OnlineShopProject.Enums;
-using OnlineShopProject.Mappers;
 using OnlineShopProject.Models;
 
-namespace OnlineShopProject.Repository.impls
+namespace OnlineShopProject.Repository
 {
+    public interface IOrderRepository
+    {
+        Task<Order> CreateOrderAsync(Order order);
+        Task<List<Order>> GetAllOrdersAsync(AppUser appUser);
+        Task<Order> GetOrderByIdAsync(int id);
+        Task<Order> ChangeOrderStatusAsync(Order order, OrderStatus status);
+        Task<Order> GetOrderInProcessStatusByUserAsync(AppUser user);
+    }
+
     public class OrderRepository : IOrderRepository
     {
         private readonly ApplicationDBContext _context;

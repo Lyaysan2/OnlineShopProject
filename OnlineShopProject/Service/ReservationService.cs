@@ -9,12 +9,12 @@ namespace OnlineShopProject.Service
         private readonly IServiceProvider _serviceProvider;
         private Timer hostedTimer;
         private Timer reservationTimer;
-        private readonly ILogger<ReservationService> logger;
+        private readonly ILogger<ReservationService> _logger;
 
-        public ReservationService(IServiceProvider serviceProvider)
+        public ReservationService(IServiceProvider serviceProvider, ILogger<ReservationService> logger)
         {
             _serviceProvider = serviceProvider;
-            this.logger = logger;
+            _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -38,7 +38,7 @@ namespace OnlineShopProject.Service
             {
                 orderProduct.Reserved = ReservationStatus.Reserved;
                 await dbContext.SaveChangesAsync();
-                logger.LogInformation($"Reservation for orderProduct {orderProduct.OrderId}-{orderProduct.ProductId} started");
+                _logger.LogInformation($"Reservation for orderProduct {orderProduct.OrderId}-{orderProduct.ProductId} started");
                 reservationTimer = new Timer(EndReservation, orderProduct, TimeSpan.FromMinutes(10), Timeout.InfiniteTimeSpan);
             }
         }
@@ -49,10 +49,11 @@ namespace OnlineShopProject.Service
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
 
             var orderProduct = (OrderProduct)state;
-            var orderProductEntity = dbContext.OrderProduct.First(op => op.OrderId == orderProduct.OrderId && op.ProductId == orderProduct.ProductId);
+            var orderProductEntity = dbContext.OrderProduct.First(op => op.OrderId == orderProduct.OrderId 
+                && op.ProductId == orderProduct.ProductId);
             orderProductEntity.Reserved = ReservationStatus.NotReserved;
             await dbContext.SaveChangesAsync();
-            logger.LogInformation($"Reservation for orderProduct {orderProduct.OrderId}-{orderProduct.ProductId} ended");
+            _logger.LogInformation($"Reservation for orderProduct {orderProduct.OrderId}-{orderProduct.ProductId} ended");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

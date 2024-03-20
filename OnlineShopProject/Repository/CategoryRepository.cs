@@ -2,8 +2,16 @@
 using OnlineShopProject.Data;
 using OnlineShopProject.Models;
 
-namespace OnlineShopProject.Repository.impls
+namespace OnlineShopProject.Repository
 {
+    public interface ICategoryRepository
+    {
+        Task<List<Category>> GetAllAsync();
+        Task<List<Category>> GetByNamesAsync(List<string> names);
+        Task<Category> CreateCategoryAsync(Category category);
+        Task<Category> UpdateCategoryAsync(int id, Category category);
+    }
+
     public class CategoryRepository : ICategoryRepository
     {
         private readonly ApplicationDBContext _context;

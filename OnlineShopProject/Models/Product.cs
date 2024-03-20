@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace OnlineShopProject.Models
+﻿namespace OnlineShopProject.Models
 {
     public class Product
     {

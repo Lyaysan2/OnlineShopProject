@@ -2,8 +2,18 @@
 using OnlineShopProject.Data;
 using OnlineShopProject.Models;
 
-namespace OnlineShopProject.Repository.impls
+namespace OnlineShopProject.Repository
 {
+    public interface IProductRepository
+    {
+        Task<List<Product>> GetAllAsync();
+        Task<List<Product>> GetAllBySearchNameAsync(string searchName);
+        Task<List<Product>> GetAllByCategoryNamesAsync(List<Category> categories);
+        Task<Product?> GetByIdAsync(int id);
+        Task<List<int>> GetQuantityListProductsAsync(List<int> productIds);
+        Task<List<Product>> ReduceProductQuantity(Dictionary<int, int> productQuantity);
+    }
+
     public class ProductRepository : IProductRepository
     {
         private readonly ApplicationDBContext _context;
@@ -20,7 +30,8 @@ namespace OnlineShopProject.Repository.impls
         public async Task<List<Product>> GetAllByCategoryNamesAsync(List<Category> categories)
         {
             var catIds = categories.Select(c => c.Id).ToList();
-            return await _context.Product.Where(p => catIds.All(c => p.Categories.Select(i => i.Id).Contains(c))).Include(p => p.Categories).ToListAsync();
+            return await _context.Product.Where(p => catIds.All(c => p.Categories.Select(i => i.Id).Contains(c)))
+                .Include(p => p.Categories).ToListAsync();
         }
 
         public async Task<List<Product>> GetAllBySearchNameAsync(string searchName)
